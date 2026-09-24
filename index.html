@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Silex v3.9.0">
+<link rel="stylesheet" href="/css/index-afb81c1441c416451ed9ce929bf8734d17c8e76c7ee489bf4795cbf475483af7.css" />
+
+
+
+
+
+</head>
+<body id="i99t"><div id="in5f" class="silex-default-container"><!-- 1. The HTML Container -->
+<div class="pixiv-feed-container">
+    <div id="pixiv-status-box" style="text-align: center; padding: 20px; color: #888; font-size: 14px;">Loading illustrations...</div>
+    <div id="pixiv-grid-box" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;"></div>
+</div>
+
+<style>
+    .pixiv-card {
+        background: #ffffff;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease;
+    }
+    .pixiv-card:hover { transform: translateY(-2px); }
+    .pixiv-link { text-decoration: none; color: inherit; }
+    .pixiv-img-wrapper {
+        position: relative;
+        width: 100%;
+        padding-top: 100%;
+        background-color: #f5f5f5;
+    }
+    .pixiv-img-wrapper img {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        object-fit: cover;
+    }
+</style>
+
+<!-- 2. The Script Engine -->
+<script>
+(function() {
+    // Wait until the Silex HTML container is fully loaded into the DOM
+    document.addEventListener("DOMContentLoaded", () => {
+        const PIXIV_USER_ID = "41623824"; 
+        
+        // Corrected clean URLs without typos
+        const RSS_URL = "https://rsshub.app" + PIXIV_USER_ID;
+        const API_URL = "https://allorigins.win" + encodeURIComponent(RSS_URL);
+
+        const grid = document.getElementById('pixiv-grid-box');
+        const status = document.getElementById('pixiv-status-box');
+
+        // Safety check: exit if elements aren't ready yet in Silex preview
+        if (!grid || !status) return;
+
+        async function loadFeed() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Network issue');
+                const wrapper = await response.json();
+                
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(wrapper.contents, "text/xml");
+                const items = xmlDoc.getElementsByTagName("item");
+
+                if (!items || items.length === 0) {
+                    throw new Error('No items found');
+                }
+
+                status.style.display = 'none';
+
+                const limit = Math.min(items.length, 12);
+                for (let i = 0; i < limit; i++) {
+                    const item = items[i];
+                    
+                    // Direct target tag extraction
+                    const linkTag = item.getElementsByTagName("link")[0];
+                    const link = linkTag ? linkTag.textContent || linkTag.innerHTML : "https://pixiv.net" + PIXIV_USER_ID;
+                    
+                    const descTag = item.getElementsByTagName("description")[0];
+                    const description = descTag ? descTag.textContent : "";
+                    
+                    const titleTag = item.getElementsByTagName("title")[0];
+                    const title = titleTag ? titleTag.textContent : "";
+
+                    if (description) {
+                        const descDoc = parser.parseFromString(description, 'text/html');
+                        const imgTag = descDoc.querySelector('img');
+                        
+                        if (imgTag && imgTag.src) {
+                            let proxySrc = imgTag.src.replace('i.pximg.net', 'i.pixiv.re');
+
+                            const card = document.createElement('div');
+                            card.className = 'pixiv-card';
+                            card.innerHTML = `
+                                <a href="${link.trim()}" target="_blank" rel="noopener" class="pixiv-link">
+                                    <div class="pixiv-img-wrapper">
+                                        <img src="${proxySrc}" alt="${title}" loading="lazy">
+                                    </div>
+                                </a>
+                            `;
+                            grid.appendChild(card);
+                        }
+                    }
+                }
+            } catch (err) {
+                status.textContent = 'Unable to display Pixiv feed right now.';
+                console.error(err);
+            }
+        }
+        loadFeed();
+    });
+})();
+</script>
+</div><div id="irqg" class="silex-default-container"><iframe data-tally-src="https://tally.so/embed/2E0OYA?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="lazy" width="100%" height="576" frameborder="0" marginheight="0" marginwidth="0" title="Contact form
+"></iframe>
+<script>var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s);}</script></div></body>
+</html>
