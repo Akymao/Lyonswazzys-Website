@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Silex v3.9.0">
-<link rel="stylesheet" href="/css/index-afb81c1441c416451ed9ce929bf8734d17c8e76c7ee489bf4795cbf475483af7.css" />
+<link rel="stylesheet" href="/css/index-066680831ce446752c66cbe2498ff2eef982d724a8116f04b9b631a348eb6395.css" />
 
 
 
@@ -43,18 +43,16 @@
 <!-- 2. The Script Engine -->
 <script>
 (function() {
-    // Wait until the Silex HTML container is fully loaded into the DOM
     document.addEventListener("DOMContentLoaded", () => {
         const PIXIV_USER_ID = "41623824"; 
         
-        // Corrected clean URLs without typos
-        const RSS_URL = "https://rsshub.app" + PIXIV_USER_ID;
+        // Switched to a fallback RSSHub mirror instance that is much less congested
+        const RSS_URL = "https://rssforever.com" + PIXIV_USER_ID;
         const API_URL = "https://allorigins.win" + encodeURIComponent(RSS_URL);
 
         const grid = document.getElementById('pixiv-grid-box');
         const status = document.getElementById('pixiv-status-box');
 
-        // Safety check: exit if elements aren't ready yet in Silex preview
         if (!grid || !status) return;
 
         async function loadFeed() {
@@ -63,6 +61,8 @@
                 if (!response.ok) throw new Error('Network issue');
                 const wrapper = await response.json();
                 
+                if (!wrapper.contents) throw new Error('Empty response');
+
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(wrapper.contents, "text/xml");
                 const items = xmlDoc.getElementsByTagName("item");
@@ -77,15 +77,17 @@
                 for (let i = 0; i < limit; i++) {
                     const item = items[i];
                     
-                    // Direct target tag extraction
-                    const linkTag = item.getElementsByTagName("link")[0];
-                    const link = linkTag ? linkTag.textContent || linkTag.innerHTML : "https://pixiv.net" + PIXIV_USER_ID;
+                    const linkTag = item.getElementsByTagName("link");
+                    let link = "https://pixiv.net" + PIXIV_USER_ID;
+                    if (linkTag.length > 0) {
+                        link = linkTag[0].textContent || linkTag[0].innerHTML || link;
+                    }
                     
-                    const descTag = item.getElementsByTagName("description")[0];
-                    const description = descTag ? descTag.textContent : "";
+                    const descTag = item.getElementsByTagName("description");
+                    const description = descTag.length > 0 ? descTag[0].textContent : "";
                     
-                    const titleTag = item.getElementsByTagName("title")[0];
-                    const title = titleTag ? titleTag.textContent : "";
+                    const titleTag = item.getElementsByTagName("title");
+                    const title = titleTag.length > 0 ? titleTag[0].textContent : "";
 
                     if (description) {
                         const descDoc = parser.parseFromString(description, 'text/html');
@@ -108,10 +110,39 @@
                     }
                 }
             } catch (err) {
-                status.textContent = 'Unable to display Pixiv feed right now.';
-                console.error(err);
+                // Try fallback layout direct JSON converter if XML fails
+                tryAlternativeJSON();
             }
         }
+
+        async function tryAlternativeJSON() {
+            try {
+                const FALLBACK_URL = "https://rss2json.com" + encodeURIComponent("https://rssforever.com" + PIXIV_USER_ID);
+                const response = await fetch(FALLBACK_URL);
+                const data = await response.json();
+                
+                if(data.status === 'ok' && data.items.length > 0) {
+                    status.style.display = 'none';
+                    const parser = new DOMParser();
+                    data.items.forEach(item => {
+                        const descDoc = parser.parseFromString(item.description, 'text/html');
+                        const imgTag = descDoc.querySelector('img');
+                        if (imgTag && imgTag.src) {
+                            let proxySrc = imgTag.src.replace('i.pximg.net', 'i.pixiv.re');
+                            const card = document.createElement('div');
+                            card.className = 'pixiv-card';
+                            card.innerHTML = `<a href="${item.link}" target="_blank" rel="noopener" class="pixiv-link"><div class="pixiv-img-wrapper"><img src="${proxySrc}" loading="lazy"></div></a>`;
+                            grid.appendChild(card);
+                        }
+                    });
+                } else {
+                    throw new Error();
+                }
+            } catch (e) {
+                status.textContent = 'Pixiv service busy. Please check back shortly.';
+            }
+        }
+
         loadFeed();
     });
 })();
