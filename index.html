@@ -20,10 +20,9 @@
 </div>
 
 <style>
-  /* Slideshow container sizing */
   .silex-slideshow-container {
     width: 100%;
-    height: 400px; /* Adjust height as needed for your Silex layout */
+    height: 400px; 
     position: relative;
     overflow: hidden;
     background-color: #000;
@@ -39,7 +38,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Keeps image proportions; change to 'cover' to fill space */
+    object-fit: contain; 
     opacity: 0;
     transition: opacity 1s ease-in-out;
   }
@@ -53,60 +52,32 @@
 </style>
 
 <script>
-  // 1. PLACE YOUR GOOGLE DRIVE FOLDER ID HERE
-  const FOLDER_ID = '1PqJlWpzNo1zmMwizf40Q39DQrvtfPvgZ';
-
-  // 2. Adjust slideshow speed (in milliseconds)
+  // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BETWEEN THE QUOTES BELOW:
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzNDs7hdsfnl2P_k5c6NAcovDC-ifPGWryaY_GvA3NLYdmoVKPFqe3f5-p9a3JwFGz0Mw/exec';
   const SLIDE_DURATION = 4000; 
 
   async function loadGDriveSlideshow() {
     const container = document.getElementById('gdrive-slideshow');
-    if (FOLDER_ID === 'YOUR_GOOGLE_DRIVE_FOLDER_ID_HERE') {
-      container.innerHTML = '<p class="loading-text">Error: Please replace YOUR_GOOGLE_DRIVE_FOLDER_ID_HERE with your actual folder ID in the code.</p>';
-      return;
-    }
-
+    
     try {
-      // Use a public proxy to parse the public Google Drive folder structure
-      const url = `https://allorigins.win{encodeURIComponent('https://google.com' + FOLDER_ID)}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      // Parse the HTML to extract image IDs
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(data.contents, 'text/html');
-      const textContent = data.contents;
-      
-      // Regex to capture file IDs within the Drive folder view page source
-      const regex = /"([^"]+)"\s*,\s*\[\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"image\/[^"]+"/g;
-      let match;
-      const imageIds = [];
-      
-      while ((match = regex.exec(textContent)) !== null) {
-        if (match[1] && !imageIds.includes(match[1])) {
-          imageIds.push(match[1]);
-        }
-      }
+      const response = await fetch(WEB_APP_URL);
+      const imageLinks = await response.json();
 
-      if (imageIds.length === 0) {
-        container.innerHTML = '<p class="loading-text">No images found. Ensure your folder is shared as "Anyone with the link can view".</p>';
+      if (!imageLinks || imageLinks.length === 0) {
+        container.innerHTML = '<p class="loading-text">No images found in your Drive folder.</p>';
         return;
       }
 
-      // Clear loading text
-      container.innerHTML = '';
+      container.innerHTML = ''; // Clear loading text
 
-      // Create image elements
-      imageIds.forEach((id, index) => {
+      imageLinks.forEach((url, index) => {
         const img = document.createElement('img');
-        // Construct the direct image web link
-        img.src = `https://googleusercontent.com{id}`;
+        img.src = url;
         img.classList.add('slide-img');
         if (index === 0) img.classList.add('active');
         container.appendChild(img);
       });
 
-      // Start the slideshow animation loop
       let currentSlide = 0;
       const slides = container.querySelectorAll('.slide-img');
       
@@ -118,11 +89,10 @@
 
     } catch (error) {
       console.error(error);
-      container.innerHTML = '<p class="loading-text">Failed to load images. Please check your connection or folder link.</p>';
+      container.innerHTML = '<p class="loading-text">Connection error. Please check your Web App URL deployment.</p>';
     }
   }
 
-  // Initial load
   loadGDriveSlideshow();
 </script>
 </div><div class="silex-default-container" id="ila35"></div></div><div class="silex-default-container" id="i2746"></div></body>
