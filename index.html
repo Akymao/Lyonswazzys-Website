@@ -4,103 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Silex v3.9.0">
-<link rel="stylesheet" href="/css/index-066680831ce446752c66cbe2498ff2eef982d724a8116f04b9b631a348eb6395.css" />
+<link rel="stylesheet" href="/css/index-ccb170ee49d0d76963fc88bc732155871455697d54f4da1d8236de24446e1ca0.css" />
 
 
 
 
 
 </head>
-<body id="i99t"><div id="in5f" class="silex-default-container"><!-- 1. The HTML Container Layout -->
-<div class="pixiv-feed-container">
-    <div id="pixiv-status-box" style="text-align: center; padding: 20px; color: #888; font-size: 14px;">Loading illustrations...</div>
-    <div id="pixiv-grid-box" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;"></div>
-</div>
-
-<style>
-    .pixiv-card {
-        background: #ffffff;
-        border-radius: 6px;
-        overflow: hidden;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-        transition: transform 0.2s ease;
-    }
-    .pixiv-card:hover { transform: translateY(-2px); }
-    .pixiv-link { text-decoration: none; color: inherit; }
-    .pixiv-img-wrapper {
-        position: relative;
-        width: 100%;
-        padding-top: 100%;
-        background-color: #f5f5f5;
-    }
-    .pixiv-img-wrapper img {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        object-fit: cover;
-    }
-</style>
-
-<!-- 2. The Optimized Script Engine -->
-<script>
-(function() {
-    document.addEventListener("DOMContentLoaded", () => {
-        const PIXIV_USER_ID = "41623824"; 
-        
-        // Bypasses un-stabilized RSS channels entirely by using a direct allorigins fetch 
-        // to query the open-source pixiv token fallback endpoint.
-        const TARGET_URL = "https://wordpress.com"; 
-        // Note: As an absolute fail-safe if third party servers block you, this script falls back to an open JSON endpoint.
-        const API_URL = "https://allorigins.win" + encodeURIComponent("https://pixiv.moe" + PIXIV_USER_ID);
-
-        const grid = document.getElementById('pixiv-grid-box');
-        const status = document.getElementById('pixiv-status-box');
-
-        if (!grid || !status) return;
-
-        async function fetchGallery() {
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error();
-                const wrapper = await response.json();
-                const data = JSON.parse(wrapper.contents);
-
-                if (!data || !data.illusts || data.illusts.length === 0) {
-                    throw new Error();
-                }
-
-                status.style.display = 'none';
-                
-                // Show up to 12 recent works
-                const list = data.illusts.slice(0, 12);
-                list.forEach(work => {
-                    // Extract image link safely bypassing typical proxy layers
-                    let imgSrc = work.image_urls.square_medium || work.image_urls.medium;
-                    let proxySrc = imgSrc.replace('i.pximg.net', 'i.pixiv.re');
-
-                    const card = document.createElement('div');
-                    card.className = 'pixiv-card';
-                    card.innerHTML = `
-                        <a href="https://pixiv.net{work.id}" target="_blank" rel="noopener" class="pixiv-link">
-                            <div class="pixiv-img-wrapper">
-                                <img src="${proxySrc}" alt="${work.title}" loading="lazy">
-                            </div>
-                        </a>
-                    `;
-                    grid.appendChild(card);
-                });
-
-            } catch (e) {
-                // Hardcoded Ultimate Fallback: If APIs are blocked globally by the server today,
-                // this forces the loading screen to seamlessly guide users straight to your gallery profile.
-                status.innerHTML = `Pixiv data layer is restricted. <a href="https://pixiv.net{PIXIV_USER_ID}" target="_blank" style="color:#0096ff; text-decoration:underline; font-weight:bold;">Click here to view my full portfolio directly on Pixiv!</a>`;
-            }
-        }
-
-        fetchGallery();
-    });
-})();
-</script>
-</div><div id="irqg" class="silex-default-container"><iframe data-tally-src="https://tally.so/embed/2E0OYA?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="lazy" width="100%" height="576" frameborder="0" marginheight="0" marginwidth="0" title="Contact form
+<body id="i99t"><div class="silex-default-container" id="i9gt4"></div><div id="ih99t" class="silex-default-container"><div class="silex-default-container" id="i6an6"></div><div class="silex-default-container" id="io6d2"><iframe data-tally-src="https://tally.so/embed/2E0OYA?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="lazy" width="100%" height="576" frameborder="0" marginheight="0" marginwidth="0" title="Contact form
 "></iframe>
-<script>var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s);}</script></div></body>
+<script>var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s);}</script></div><div class="silex-default-container" id="ila35"></div></div><div class="silex-default-container" id="i2746"></div></body>
 </html>
